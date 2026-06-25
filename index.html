@@ -149,34 +149,28 @@
   <span class="chip">🇻🇪 Coordinación de ayuda · Terremoto 2026</span>
   <h1>Venezuela necesita <em>nuestra ayuda.</em></h1>
   <p>Portal informativo para donaciones, centros de acopio y reporte de zonas con necesidad de ayuda humanitaria.</p>
-  <div class="stats" id="stats"></div>
 </div></section>
 
 <div class="tabwrap"><div class="wrap">
   <nav class="tabs" role="tablist" aria-label="Secciones">
-    <button role="tab" aria-selected="true" data-tab="necesidades">Necesidades</button>
-    <button role="tab" aria-selected="false" data-tab="acopio">Centros de acopio</button>
+    <button role="tab" aria-selected="true" data-tab="acopio">Centros de acopio</button>
+    <button role="tab" aria-selected="false" data-tab="necesidades">Necesidades</button>
     <button role="tab" aria-selected="false" data-tab="emergencias">Emergencias</button>
   </nav>
 </div></div>
 
 <main class="wrap">
-  <section class="section active" id="necesidades" role="tabpanel">
+  <section class="section" id="necesidades" role="tabpanel">
     <p class="lead">Registra dónde se necesitan donaciones, ayuda humanitaria, productos de primera necesidad e insumos médicos. Filtra por tu estado, revisa qué hace falta y a quién contactar. Si vas a cubrir algo, márcalo para que no se duplique el esfuerzo.</p>
     <div class="statebar" id="states-need"></div>
     <div class="toolbar">
-      <input type="search" id="search-need" placeholder="Buscar hospital, zona o insumo…" aria-label="Buscar necesidades">
-      <select id="cat-need" aria-label="Filtrar por categoría">
-        <option value="">Todas las categorías</option>
-        <option value="med">Insumos médicos</option><option value="agua">Agua</option>
-        <option value="comida">Comida</option><option value="otros">Otros</option>
-      </select>
+      <input type="search" id="search-need" placeholder="Buscar hospital, zona, insumo o categoría…" aria-label="Buscar necesidades">
       <button class="btn" id="add-need">+ Publicar necesidad</button>
     </div>
     <div class="grid" id="list-need"></div>
   </section>
 
-  <section class="section" id="acopio" role="tabpanel">
+  <section class="section active" id="acopio" role="tabpanel">
     <p class="lead">Puntos habilitados para recibir y concentrar las donaciones antes de distribuirlas a las zonas afectadas. Cada centro indica qué recibe, dónde está, su horario y a quién contactar para coordinar la entrega.</p>
     <div class="statebar" id="states-acopio"></div>
     <div class="toolbar">
@@ -236,22 +230,18 @@ async function refresh(){
   NEEDS=n.map(r=>({id:r.id,lugar:r.lugar,estado:r.estado,categoria:r.categoria,item:r.item,cantidad:r.cantidad,contacto:r.contacto,cubierto:!!r.cubierto,ts:toTs(r)}));
   CENTROS=c.map(r=>({id:r.id,nombre:r.nombre,estado:r.estado,direccion:r.direccion,recibe:r.recibe,horario:r.horario,contacto:r.contacto,ts:toTs(r)}));
   TELS=t.map(r=>({id:r.id,servicio:r.servicio,numero:r.numero,scope:r.scope,ts:toTs(r)}));
-  renderStats();renderNeed();renderAcopio();renderTel();
+  renderNeed();renderAcopio();renderTel();
 }
 
 function renderStats(){
-  const activas=NEEDS.filter(n=>!n.cubierto).length;
-  const estados=new Set(NEEDS.filter(n=>!n.cubierto).map(n=>n.estado)).size;
   document.getElementById("stats").innerHTML=
-    '<div class="stat"><div class="num">'+activas+'</div><div class="lbl">Necesidades humanitarias</div></div>'+
-    '<div class="stat"><div class="num">'+estados+'</div><div class="lbl">Estados con necesidad</div></div>'+
     '<div class="stat"><div class="num">'+CENTROS.length+'</div><div class="lbl">Centros de acopio</div></div>';
 }
 
 function renderNeed(){
   const bar=document.getElementById("states-need");
-  const counts={};NEEDS.forEach(n=>{if(!n.cubierto)counts[n.estado]=(counts[n.estado]||0)+1;});
-  const active=ESTADOS.filter(e=>counts[e]).sort((a,b)=>counts[b]-counts[a]);
+  const counts={};NEEDS.forEach(n=>{if(!n.cubierto&&n.estado)counts[n.estado]=(counts[n.estado]||0)+1;});
+  const active=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]);
   let html='<button class="chipf" aria-pressed="'+(needFilter.estado==='')+'" data-e="">Todos</button>';
   active.forEach(e=>html+='<button class="chipf" aria-pressed="'+(needFilter.estado===e)+'" data-e="'+esc(e)+'">'+esc(e)+'<span class="n">'+counts[e]+'</span></button>');
   bar.innerHTML=html;
@@ -259,14 +249,13 @@ function renderNeed(){
   const list=document.getElementById("list-need");
   let rows=NEEDS.filter(n=>{
     if(needFilter.estado&&n.estado!==needFilter.estado)return false;
-    if(needFilter.cat&&n.categoria!==needFilter.cat)return false;
-    if(needFilter.q){const t=(n.lugar+" "+n.item+" "+n.estado).toLowerCase();if(!t.includes(needFilter.q.toLowerCase()))return false;}
+    if(needFilter.q){const t=(n.lugar+" "+n.item+" "+n.estado+" "+(n.categoria||"")).toLowerCase();if(!t.includes(needFilter.q.toLowerCase()))return false;}
     return true;});
   rows.sort((a,b)=>(a.cubierto?1:0)-(b.cubierto?1:0)||(b.ts-a.ts));
   if(!rows.length){list.innerHTML=emptyBox("No hay necesidades publicadas aquí","Publica la primera con el botón “Publicar necesidad”.");return;}
   list.innerHTML=rows.map(n=>'<article class="card '+(n.cubierto?'done':'')+'">'+
     '<div class="head"><div><div class="place">'+esc(n.lugar)+'</div><div class="estado">'+esc(n.estado)+'</div></div>'+
-    '<span class="tag '+n.categoria+'">'+(CATS[n.categoria]||"Otros")+'</span></div>'+
+    (n.categoria?'<span class="tag otros">'+esc(n.categoria)+'</span>':'')+'</div>'+
     '<div class="item">'+(n.cantidad?'<b>'+esc(n.cantidad)+'</b> · ':'')+esc(n.item)+'</div>'+
     '<div class="meta">'+(n.contacto?'<a href="'+telLink(n.contacto)+'">📞 '+esc(n.contacto)+'</a>':'')+'</div>'+
     '<div class="foot">'+(n.cubierto?'<span class="badge-ok">✓ Cubierto / en camino</span>':'')+
@@ -323,7 +312,6 @@ document.querySelectorAll('.tabs button').forEach(btn=>{btn.onclick=()=>{
 };});
 
 document.getElementById('search-need').oninput=e=>{needFilter.q=e.target.value;renderNeed();};
-document.getElementById('cat-need').onchange=e=>{needFilter.cat=e.target.value;renderNeed();};
 document.getElementById('search-acopio').oninput=e=>{acopioFilter.q=e.target.value;renderAcopio();};
 
 const overlay=document.getElementById('overlay'),modal=document.getElementById('modal');
@@ -335,8 +323,8 @@ function estadoOptions(){return ESTADOS.map(e=>'<option value="'+e+'">'+e+'</opt
 
 function formNeed(){openModal('<h2>Publicar necesidad</h2><p class="sub">Indica qué hace falta y dónde.</p>'+
   '<div class="field"><label>Hospital o zona</label><input id="f-lugar" placeholder="Ej: Hospital Universitario de Mérida"></div>'+
-  '<div class="row2"><div class="field"><label>Estado</label><select id="f-estado">'+estadoOptions()+'</select></div>'+
-  '<div class="field"><label>Categoría</label><select id="f-cat"><option value="med">Insumos médicos</option><option value="agua">Agua</option><option value="comida">Comida</option><option value="otros">Otros</option></select></div></div>'+
+  '<div class="row2"><div class="field"><label>Estado</label><input id="f-estado" placeholder="Ej: Mérida"></div>'+
+  '<div class="field"><label>Categoría (opcional)</label><input id="f-cat" placeholder="Ej: Insumos médicos"></div></div>'+
   '<div class="field"><label>¿Qué se necesita?</label><textarea id="f-item" placeholder="Ej: Suero fisiológico, gasas estériles, guantes"></textarea></div>'+
   '<div class="row2"><div class="field"><label>Cantidad (opcional)</label><input id="f-cant" placeholder="Ej: 200 unidades"></div>'+
   '<div class="field"><label>Contacto</label><input id="f-cont" placeholder="Teléfono"></div></div>'+
@@ -376,7 +364,8 @@ document.getElementById('add-need').onclick=formNeed;
 document.getElementById('add-acopio').onclick=formAcopio;
 document.getElementById('add-tel').onclick=formTel;
 document.getElementById('cta-top').onclick=formNeed;
-document.getElementById('fab-btn').dataset.t='need';
+document.getElementById('fab-btn').dataset.t='acopio';
+document.getElementById('fab-btn').textContent='+ Registrar centro';
 document.getElementById('fab-btn').onclick=()=>{document.getElementById('fab-btn').dataset.t==='acopio'?formAcopio():formNeed();};
 
 refresh();
