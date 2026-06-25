@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Venezuela te necesita</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF7F1; --card:#FFFFFF; --ink:#1B2024; --muted:#5E6670;
+    --line:#E9E3D8; --navy:#0F2A47; --navy-2:#13314F; --gold:#F2C14E; --gold-soft:#FBEFCF;
+    --med:#C2453B; --med-soft:#FBEAE8;
+    --agua:#2A6FB0; --agua-soft:#E6F0F8;
+    --comida:#C07A12; --comida-soft:#FAF0DD;
+    --otros:#5A5560; --otros-soft:#EFEDF0;
+    --ok:#2E7D52; --ok-soft:#E5F1EA;
+    --radius:14px; --shadow:0 1px 2px rgba(15,42,71,.05),0 6px 20px rgba(15,42,71,.06);
+    --serif:"Fraunces",Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--navy)}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(250,247,241,.9);
+    backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:600;font-size:1.02rem;letter-spacing:-.01em}
+  .logo .flag{font-size:1.1rem}
+  .topbar .cta{font-family:var(--sans);font-size:.88rem;font-weight:600;background:var(--navy);
+    color:#fff;border:none;border-radius:999px;padding:9px 16px;cursor:pointer}
+  .topbar .cta:hover{background:var(--navy-2)}
+  .hero{background:var(--navy);color:#F5F2E9;padding:56px 0 48px;
+    background-image:radial-gradient(1100px 360px at 78% -10%,rgba(242,193,78,.16),transparent 60%)}
+  .hero .chip{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600;
+    letter-spacing:.06em;text-transform:uppercase;color:#CBB987;border:1px solid rgba(242,193,78,.4);
+    border-radius:999px;padding:6px 14px;margin-bottom:22px}
+  .hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(2.2rem,6vw,3.7rem);
+    line-height:1.06;letter-spacing:-.01em;margin:0 0 16px;max-width:16ch}
+  .hero h1 em{font-style:italic;color:var(--gold);font-weight:500}
+  .hero p{font-size:1.05rem;color:#C9D2DC;max-width:54ch;margin:0 0 30px}
+  .hero .stats{display:flex;flex-wrap:wrap;gap:14px}
+  .stat{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;
+    padding:16px 22px;min-width:130px}
+  .stat .num{font-family:var(--serif);font-size:2.1rem;line-height:1;color:#fff}
+  .stat .lbl{font-size:.82rem;color:#A9B6C4;margin-top:6px}
+  .tabwrap{position:sticky;top:60px;z-index:20;background:var(--paper);border-bottom:1px solid var(--line)}
+  .tabs{display:flex;gap:2px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tabs button{flex:0 0 auto;background:none;border:none;color:var(--muted);
+    font-family:inherit;font-size:.96rem;font-weight:600;padding:15px 18px;cursor:pointer;
+    border-bottom:3px solid transparent;white-space:nowrap}
+  .tabs button[aria-selected="true"]{color:var(--navy);border-bottom-color:var(--gold)}
+  .tabs button:focus-visible{outline:2px solid var(--navy);outline-offset:-4px}
+  main{padding:26px 0 40px}
+  .section{display:none}.section.active{display:block}
+  .lead{color:var(--muted);font-size:1rem;margin:2px 0 22px;max-width:64ch}
+  .statebar{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:18px}
+  .chipf{flex:0 0 auto;background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:8px 15px;font-size:.86rem;font-weight:600;cursor:pointer;color:var(--muted);
+    display:flex;align-items:center;gap:7px}
+  .chipf[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .chipf .n{font-size:.72rem;background:var(--gold-soft);color:#9a7414;border-radius:999px;padding:1px 7px;font-weight:700}
+  .chipf[aria-pressed="true"] .n{background:rgba(255,255,255,.2);color:#fff}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+  .toolbar input[type="search"],.toolbar select{font-family:inherit;font-size:.94rem;padding:11px 13px;
+    border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+  .toolbar input[type="search"]{flex:1;min-width:170px}
+  .btn{font-family:inherit;font-size:.94rem;font-weight:600;padding:11px 18px;border-radius:10px;
+    border:1px solid transparent;cursor:pointer;background:var(--navy);color:#fff}
+  .btn:hover{background:var(--navy-2)}
+  .btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .btn.ghost{background:var(--card);border-color:var(--line);color:var(--ink)}
+  .btn.ghost:hover{background:var(--paper)}
+  .btn.full{width:100%}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+  .card.done{opacity:.6}
+  .card .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .card .place{font-weight:700;font-size:1.06rem;line-height:1.25}
+  .card .estado{font-size:.76rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+  .tag{font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .tag.med{background:var(--med-soft);color:var(--med)}
+  .tag.agua{background:var(--agua-soft);color:var(--agua)}
+  .tag.comida{background:var(--comida-soft);color:var(--comida)}
+  .tag.otros{background:var(--otros-soft);color:var(--otros)}
+  .card .item{font-size:.99rem}.card .item b{font-weight:700}
+  .card .meta{font-size:.88rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:5px 16px}
+  .card .meta a{font-weight:600;text-decoration:none}
+  .card .foot{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+  .card .time{font-size:.74rem;color:var(--muted);margin-left:auto}
+  .mark{font-family:inherit;font-size:.8rem;font-weight:700;border:1px solid var(--line);
+    background:var(--card);color:var(--ok);border-radius:8px;padding:6px 11px;cursor:pointer}
+  .mark.is-done{background:var(--ok-soft);border-color:var(--ok-soft)}
+  .del{font-family:inherit;font-size:.8rem;font-weight:600;border:1px solid var(--line);
+    background:var(--card);color:var(--med);border-radius:8px;padding:6px 11px;cursor:pointer}
+  .del:hover{background:var(--med-soft);border-color:var(--med-soft)}
+  .badge-ok{font-size:.72rem;font-weight:700;color:var(--ok);background:var(--ok-soft);padding:4px 10px;border-radius:999px}
+  .empty{text-align:center;color:var(--muted);padding:52px 18px;border:1px dashed var(--line);
+    border-radius:var(--radius);background:var(--card)}
+  .empty b{display:block;color:var(--ink);font-size:1.08rem;margin-bottom:5px}
+  .tel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+  .tel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:5px;position:relative}
+  .tel .svc{font-weight:600;font-size:.9rem;color:var(--muted)}
+  .tel .num{font-family:var(--serif);font-size:1.9rem;line-height:1;text-decoration:none;color:var(--ink)}
+  .tel .scope{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .tel.key{background:var(--navy);border-color:var(--navy)}
+  .tel.key .svc,.tel.key .scope{color:#A9B6C4}.tel.key .num{color:#fff}
+  .tel .x{position:absolute;top:10px;right:10px;border:none;background:none;color:var(--muted);
+    font-size:1rem;cursor:pointer;line-height:1}
+  .note{font-size:.85rem;color:#7a5a12;background:var(--gold-soft);border-radius:11px;padding:12px 14px;margin-bottom:18px}
+  .note b{color:#5e4408}
+  footer{background:var(--navy);color:#C9D2DC;padding:40px 0;margin-top:30px;font-size:.9rem}
+  footer h3{font-family:var(--serif);color:#fff;font-weight:500;font-size:1.3rem;margin:0 0 6px}
+  footer .disc{max-width:62ch;line-height:1.6;color:#9FAEBD;margin:0 0 18px}
+  footer .em{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:baseline;border-top:1px solid rgba(255,255,255,.12);padding-top:18px}
+  footer .em b{color:var(--gold)}
+  .overlay{position:fixed;inset:0;background:rgba(15,22,28,.55);display:none;align-items:flex-end;justify-content:center;z-index:50}
+  .overlay.open{display:flex}
+  @media(min-width:620px){.overlay{align-items:center;padding:20px}}
+  .modal{background:var(--card);width:100%;max-width:540px;border-radius:18px 18px 0 0;padding:24px;max-height:92vh;overflow:auto}
+  @media(min-width:620px){.modal{border-radius:18px}}
+  .modal h2{font-family:var(--serif);font-weight:500;margin:0 0 4px;font-size:1.4rem}
+  .modal .sub{color:var(--muted);font-size:.9rem;margin:0 0 18px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:.82rem;font-weight:600;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;font-family:inherit;font-size:.95rem;
+    padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:var(--paper)}
+  .field textarea{resize:vertical;min-height:64px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .modal-actions{display:flex;gap:10px;margin-top:6px}
+  .fab{position:fixed;right:16px;bottom:16px;z-index:40}
+  .fab .btn{box-shadow:0 8px 22px rgba(15,42,71,.4);font-size:1rem;padding:14px 22px;border-radius:999px}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <div class="logo"><span class="flag">🇻🇪</span> Venezuela te necesita</div>
+  <button class="cta" id="cta-top">+ Publicar necesidad</button>
+</div></div>
+
+<section class="hero"><div class="wrap">
+  <span class="chip">🇻🇪 Coordinación de ayuda · Terremoto 2026</span>
+  <h1>Venezuela necesita <em>nuestra ayuda.</em></h1>
+  <p>Portal informativo para donaciones, centros de acopio y reporte de zonas con necesidad de ayuda humanitaria.</p>
+  <div class="stats" id="stats"></div>
+</div></section>
+
+<div class="tabwrap"><div class="wrap">
+  <nav class="tabs" role="tablist" aria-label="Secciones">
+    <button role="tab" aria-selected="true" data-tab="necesidades">Necesidades</button>
+    <button role="tab" aria-selected="false" data-tab="acopio">Centros de acopio</button>
+    <button role="tab" aria-selected="false" data-tab="emergencias">Emergencias</button>
+  </nav>
+</div></div>
+
+<main class="wrap">
+  <section class="section active" id="necesidades" role="tabpanel">
+    <p class="lead">Registra dónde se necesitan donaciones, ayuda humanitaria, productos de primera necesidad e insumos médicos. Filtra por tu estado, revisa qué hace falta y a quién contactar. Si vas a cubrir algo, márcalo para que no se duplique el esfuerzo.</p>
+    <div class="statebar" id="states-need"></div>
+    <div class="toolbar">
+      <input type="search" id="search-need" placeholder="Buscar hospital, zona o insumo…" aria-label="Buscar necesidades">
+      <select id="cat-need" aria-label="Filtrar por categoría">
+        <option value="">Todas las categorías</option>
+        <option value="med">Insumos médicos</option><option value="agua">Agua</option>
+        <option value="comida">Comida</option><option value="otros">Otros</option>
+      </select>
+      <button class="btn" id="add-need">+ Publicar necesidad</button>
+    </div>
+    <div class="grid" id="list-need"></div>
+  </section>
+
+  <section class="section" id="acopio" role="tabpanel">
+    <p class="lead">Puntos habilitados para recibir y concentrar las donaciones antes de distribuirlas a las zonas afectadas. Cada centro indica qué recibe, dónde está, su horario y a quién contactar para coordinar la entrega.</p>
+    <div class="statebar" id="states-acopio"></div>
+    <div class="toolbar">
+      <input type="search" id="search-acopio" placeholder="Buscar centro o zona…" aria-label="Buscar centros">
+      <button class="btn" id="add-acopio">+ Registrar centro</button>
+    </div>
+    <div class="grid" id="list-acopio"></div>
+  </section>
+
+  <section class="section" id="emergencias" role="tabpanel">
+    <p class="lead">Números para reportar emergencias y pedir auxilio. Verifica siempre la línea local antes de llamar; pueden variar por zona y operadora.</p>
+    <div class="note"><b>Importante:</b> confirma estos números con una fuente oficial vigente. Los aportados por la comunidad pueden cambiar.</div>
+    <div class="tel-grid" id="list-tel"></div>
+    <div style="margin-top:20px"><button class="btn ghost" id="add-tel">+ Agregar número local</button></div>
+  </section>
+</main>
+
+<footer><div class="wrap">
+  <h3>Venezuela te necesita</h3>
+  <p class="disc">Iniciativa solidaria, gratuita y sin fines de lucro. La información publicada es responsabilidad de quien la envía; esta plataforma no la verifica. Al publicar una necesidad, un centro de acopio o marcar algo como cubierto, confirmas que tienes información directa sobre ello.</p>
+  <div class="em"><span><b>Emergencias:</b></span><span>911 (Movistar)</span><span>112 (Digitel)</span><span>*1 (Movilnet)</span><span>171 (línea nacional)</span></div>
+</div></footer>
+
+<div class="fab"><button class="btn" id="fab-btn">+ Publicar</button></div>
+<div class="overlay" id="overlay"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+
+<script>
+/* ====== Conexión a Supabase ====== */
+const SB_URL="https://rpclqogkrkuuzlastfrc.supabase.co/rest/v1";
+const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJwY2xxb2drcmt1dXpsYXN0ZnJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MDAyODQsImV4cCI6MjA5Nzk3NjI4NH0.JYloo69y7hBlrwmwsTK6DCBB1Ki-dJaaK1GsD2AmkzM";
+const SB_H={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
+
+async function sbGet(t){try{const r=await fetch(SB_URL+"/"+t+"?select=*&order=created_at.desc",{headers:SB_H});if(!r.ok)return[];return await r.json();}catch(e){return[];}}
+async function sbInsert(t,row){try{const r=await fetch(SB_URL+"/"+t,{method:"POST",headers:Object.assign({Prefer:"return=minimal"},SB_H),body:JSON.stringify(row)});return r.ok;}catch(e){return false;}}
+async function sbUpdate(t,id,patch){try{const r=await fetch(SB_URL+"/"+t+"?id=eq."+id,{method:"PATCH",headers:Object.assign({Prefer:"return=minimal"},SB_H),body:JSON.stringify(patch)});return r.ok;}catch(e){return false;}}
+async function sbDelete(t,id){try{const r=await fetch(SB_URL+"/"+t+"?id=eq."+id,{method:"DELETE",headers:SB_H});return r.ok;}catch(e){return false;}}
+
+const ESTADOS=["Amazonas","Anzoátegui","Apure","Aragua","Barinas","Bolívar","Carabobo","Cojedes","Delta Amacuro","Distrito Capital","Falcón","Guárico","La Guaira","Lara","Mérida","Miranda","Monagas","Nueva Esparta","Portuguesa","Sucre","Táchira","Trujillo","Yaracuy","Zulia"];
+const CATS={med:"Insumos médicos",agua:"Agua",comida:"Comida",otros:"Otros"};
+const TEL_BASE=[
+  {servicio:"Emergencias (Movistar)",numero:"911",scope:"Nacional",key:true},
+  {servicio:"Emergencias (Digitel)",numero:"112",scope:"Nacional"},
+  {servicio:"Emergencias (Movilnet)",numero:"*1",scope:"Nacional"},
+  {servicio:"Línea única nacional",numero:"171",scope:"Nacional"},
+];
+let needFilter={estado:"",cat:"",q:""}, acopioFilter={estado:"",q:""};
+
+function timeAgo(ts){if(!ts)return"";const m=Math.floor((Date.now()-ts)/60000);if(m<1)return"ahora";if(m<60)return"hace "+m+" min";const h=Math.floor(m/60);if(h<24)return"hace "+h+" h";return"hace "+Math.floor(h/24)+" d";}
+function esc(s){return(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function telLink(n){return"tel:"+(n||"").replace(/[^0-9+*]/g,"");}
+function val(i){return document.getElementById(i).value.trim();}
+function toTs(r){return r.created_at?Date.parse(r.created_at):Date.now();}
+
+let NEEDS=[],CENTROS=[],TELS=[];
+async function refresh(){
+  const [n,c,t]=await Promise.all([sbGet("necesidades"),sbGet("centros"),sbGet("telefonos")]);
+  NEEDS=n.map(r=>({id:r.id,lugar:r.lugar,estado:r.estado,categoria:r.categoria,item:r.item,cantidad:r.cantidad,contacto:r.contacto,cubierto:!!r.cubierto,ts:toTs(r)}));
+  CENTROS=c.map(r=>({id:r.id,nombre:r.nombre,estado:r.estado,direccion:r.direccion,recibe:r.recibe,horario:r.horario,contacto:r.contacto,ts:toTs(r)}));
+  TELS=t.map(r=>({id:r.id,servicio:r.servicio,numero:r.numero,scope:r.scope,ts:toTs(r)}));
+  renderStats();renderNeed();renderAcopio();renderTel();
+}
+
+function renderStats(){
+  const activas=NEEDS.filter(n=>!n.cubierto).length;
+  const estados=new Set(NEEDS.filter(n=>!n.cubierto).map(n=>n.estado)).size;
+  document.getElementById("stats").innerHTML=
+    '<div class="stat"><div class="num">'+activas+'</div><div class="lbl">Necesidades humanitarias</div></div>'+
+    '<div class="stat"><div class="num">'+estados+'</div><div class="lbl">Estados con necesidad</div></div>'+
+    '<div class="stat"><div class="num">'+CENTROS.length+'</div><div class="lbl">Centros de acopio</div></div>';
+}
+
+function renderNeed(){
+  const bar=document.getElementById("states-need");
+  const counts={};NEEDS.forEach(n=>{if(!n.cubierto)counts[n.estado]=(counts[n.estado]||0)+1;});
+  const active=ESTADOS.filter(e=>counts[e]).sort((a,b)=>counts[b]-counts[a]);
+  let html='<button class="chipf" aria-pressed="'+(needFilter.estado==='')+'" data-e="">Todos</button>';
+  active.forEach(e=>html+='<button class="chipf" aria-pressed="'+(needFilter.estado===e)+'" data-e="'+esc(e)+'">'+esc(e)+'<span class="n">'+counts[e]+'</span></button>');
+  bar.innerHTML=html;
+  bar.querySelectorAll(".chipf").forEach(c=>c.onclick=()=>{needFilter.estado=c.dataset.e;renderNeed();});
+  const list=document.getElementById("list-need");
+  let rows=NEEDS.filter(n=>{
+    if(needFilter.estado&&n.estado!==needFilter.estado)return false;
+    if(needFilter.cat&&n.categoria!==needFilter.cat)return false;
+    if(needFilter.q){const t=(n.lugar+" "+n.item+" "+n.estado).toLowerCase();if(!t.includes(needFilter.q.toLowerCase()))return false;}
+    return true;});
+  rows.sort((a,b)=>(a.cubierto?1:0)-(b.cubierto?1:0)||(b.ts-a.ts));
+  if(!rows.length){list.innerHTML=emptyBox("No hay necesidades publicadas aquí","Publica la primera con el botón “Publicar necesidad”.");return;}
+  list.innerHTML=rows.map(n=>'<article class="card '+(n.cubierto?'done':'')+'">'+
+    '<div class="head"><div><div class="place">'+esc(n.lugar)+'</div><div class="estado">'+esc(n.estado)+'</div></div>'+
+    '<span class="tag '+n.categoria+'">'+(CATS[n.categoria]||"Otros")+'</span></div>'+
+    '<div class="item">'+(n.cantidad?'<b>'+esc(n.cantidad)+'</b> · ':'')+esc(n.item)+'</div>'+
+    '<div class="meta">'+(n.contacto?'<a href="'+telLink(n.contacto)+'">📞 '+esc(n.contacto)+'</a>':'')+'</div>'+
+    '<div class="foot">'+(n.cubierto?'<span class="badge-ok">✓ Cubierto / en camino</span>':'')+
+    '<button class="mark '+(n.cubierto?'is-done':'')+'" data-m="'+n.id+'">'+(n.cubierto?"Reabrir":"Marcar cubierto")+'</button>'+
+    '<button class="del" data-d="'+n.id+'">Eliminar</button>'+
+    '<span class="time">'+timeAgo(n.ts)+'</span></div></article>').join("");
+  list.querySelectorAll(".mark").forEach(b=>b.onclick=async()=>{const n=NEEDS.find(x=>x.id===b.dataset.m);if(!n)return;await sbUpdate("necesidades",n.id,{cubierto:!n.cubierto});refresh();});
+  list.querySelectorAll(".del").forEach(b=>b.onclick=async()=>{if(!confirm("¿Eliminar esta necesidad?"))return;await sbDelete("necesidades",b.dataset.d);refresh();});
+}
+
+function renderAcopio(){
+  const bar=document.getElementById("states-acopio");
+  const counts={};CENTROS.forEach(c=>counts[c.estado]=(counts[c.estado]||0)+1);
+  const active=ESTADOS.filter(e=>counts[e]);
+  let html='<button class="chipf" aria-pressed="'+(acopioFilter.estado==='')+'" data-e="">Todos</button>';
+  active.forEach(e=>html+='<button class="chipf" aria-pressed="'+(acopioFilter.estado===e)+'" data-e="'+esc(e)+'">'+esc(e)+'<span class="n">'+counts[e]+'</span></button>');
+  bar.innerHTML=html;
+  bar.querySelectorAll(".chipf").forEach(c=>c.onclick=()=>{acopioFilter.estado=c.dataset.e;renderAcopio();});
+  const list=document.getElementById("list-acopio");
+  let rows=CENTROS.filter(c=>{
+    if(acopioFilter.estado&&c.estado!==acopioFilter.estado)return false;
+    if(acopioFilter.q){const t=(c.nombre+" "+c.direccion+" "+c.estado+" "+c.recibe).toLowerCase();if(!t.includes(acopioFilter.q.toLowerCase()))return false;}
+    return true;});
+  if(!rows.length){list.innerHTML=emptyBox("Aún no hay centros de acopio","Registra un punto de recolección con el botón “Registrar centro”.");return;}
+  list.innerHTML=rows.map(c=>'<article class="card">'+
+    '<div class="head"><div><div class="place">'+esc(c.nombre)+'</div><div class="estado">'+esc(c.estado)+'</div></div></div>'+
+    (c.recibe?'<div class="item"><b>Recibe:</b> '+esc(c.recibe)+'</div>':'')+
+    '<div class="meta">'+(c.direccion?'<span>📍 '+esc(c.direccion)+'</span>':'')+(c.horario?'<span>🕒 '+esc(c.horario)+'</span>':'')+(c.contacto?'<a href="'+telLink(c.contacto)+'">📞 '+esc(c.contacto)+'</a>':'')+'</div>'+
+    '<div class="foot"><button class="del" data-d="'+c.id+'">Eliminar</button><span class="time">'+timeAgo(c.ts)+'</span></div></article>').join("");
+  list.querySelectorAll(".del").forEach(b=>b.onclick=async()=>{if(!confirm("¿Eliminar este centro?"))return;await sbDelete("centros",b.dataset.d);refresh();});
+}
+
+function renderTel(){
+  const list=document.getElementById("list-tel");
+  list.innerHTML=TEL_BASE.map(t=>telCard(t,false)).concat(TELS.map(t=>telCard(t,true))).join("");
+  list.querySelectorAll(".x").forEach(b=>b.onclick=async()=>{await sbDelete("telefonos",b.dataset.d);refresh();});
+}
+function telCard(t,canDel){return '<div class="tel '+(t.key?'key':'')+'">'+
+  (canDel?'<button class="x" data-d="'+t.id+'" title="Eliminar">✕</button>':'')+
+  '<span class="svc">'+esc(t.servicio)+'</span>'+
+  '<a class="num" href="'+telLink(t.numero)+'">'+esc(t.numero)+'</a>'+
+  '<span class="scope">'+esc(t.scope||"")+'</span></div>';}
+
+function emptyBox(t,s){return '<div class="empty"><b>'+t+'</b>'+s+'</div>';}
+
+document.querySelectorAll('.tabs button').forEach(btn=>{btn.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected',b===btn));
+  document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id===btn.dataset.tab));
+  const fab=document.querySelector('.fab');const fb=document.getElementById('fab-btn');
+  if(btn.dataset.tab==='necesidades'){fb.dataset.t='need';fb.textContent='+ Publicar necesidad';fab.style.display='block';}
+  else if(btn.dataset.tab==='acopio'){fb.dataset.t='acopio';fb.textContent='+ Registrar centro';fab.style.display='block';}
+  else{fab.style.display='none';}
+  window.scrollTo({top:document.querySelector('.tabwrap').offsetTop-60,behavior:'smooth'});
+};});
+
+document.getElementById('search-need').oninput=e=>{needFilter.q=e.target.value;renderNeed();};
+document.getElementById('cat-need').onchange=e=>{needFilter.cat=e.target.value;renderNeed();};
+document.getElementById('search-acopio').oninput=e=>{acopioFilter.q=e.target.value;renderAcopio();};
+
+const overlay=document.getElementById('overlay'),modal=document.getElementById('modal');
+function openModal(h){modal.innerHTML=h;overlay.classList.add('open');}
+function closeModal(){overlay.classList.remove('open');}
+overlay.onclick=e=>{if(e.target===overlay)closeModal();};
+window.closeModal=closeModal;
+function estadoOptions(){return ESTADOS.map(e=>'<option value="'+e+'">'+e+'</option>').join("");}
+
+function formNeed(){openModal('<h2>Publicar necesidad</h2><p class="sub">Indica qué hace falta y dónde.</p>'+
+  '<div class="field"><label>Hospital o zona</label><input id="f-lugar" placeholder="Ej: Hospital Universitario de Mérida"></div>'+
+  '<div class="row2"><div class="field"><label>Estado</label><select id="f-estado">'+estadoOptions()+'</select></div>'+
+  '<div class="field"><label>Categoría</label><select id="f-cat"><option value="med">Insumos médicos</option><option value="agua">Agua</option><option value="comida">Comida</option><option value="otros">Otros</option></select></div></div>'+
+  '<div class="field"><label>¿Qué se necesita?</label><textarea id="f-item" placeholder="Ej: Suero fisiológico, gasas estériles, guantes"></textarea></div>'+
+  '<div class="row2"><div class="field"><label>Cantidad (opcional)</label><input id="f-cant" placeholder="Ej: 200 unidades"></div>'+
+  '<div class="field"><label>Contacto</label><input id="f-cont" placeholder="Teléfono"></div></div>'+
+  '<div class="modal-actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn full" id="save">Publicar</button></div>');
+  document.getElementById('save').onclick=async()=>{const lugar=val('f-lugar'),item=val('f-item');
+    if(!lugar||!item){alert("Indica al menos el hospital/zona y qué se necesita.");return;}
+    const ok=await sbInsert("necesidades",{lugar,estado:val('f-estado'),categoria:val('f-cat'),item,cantidad:val('f-cant'),contacto:val('f-cont'),cubierto:false});
+    if(!ok){alert("No se pudo guardar. Revisa la conexión o que las tablas estén creadas en Supabase.");return;}
+    closeModal();refresh();};}
+
+function formAcopio(){openModal('<h2>Registrar centro de acopio</h2><p class="sub">Un punto donde la gente puede llevar donaciones.</p>'+
+  '<div class="field"><label>Nombre del centro</label><input id="f-nombre" placeholder="Ej: Cancha cubierta, Plaza Bolívar"></div>'+
+  '<div class="field"><label>Estado</label><select id="f-estado">'+estadoOptions()+'</select></div>'+
+  '<div class="field"><label>Dirección</label><input id="f-dir" placeholder="Calle, sector, referencia"></div>'+
+  '<div class="field"><label>¿Qué recibe?</label><textarea id="f-recibe" placeholder="Ej: Agua, alimentos no perecederos, ropa"></textarea></div>'+
+  '<div class="row2"><div class="field"><label>Horario</label><input id="f-hor" placeholder="Ej: 8am - 6pm"></div>'+
+  '<div class="field"><label>Contacto</label><input id="f-cont" placeholder="Teléfono"></div></div>'+
+  '<div class="modal-actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn full" id="save">Registrar</button></div>');
+  document.getElementById('save').onclick=async()=>{const nombre=val('f-nombre'),direccion=val('f-dir');
+    if(!nombre||!direccion){alert("Indica al menos el nombre y la dirección.");return;}
+    const ok=await sbInsert("centros",{nombre,estado:val('f-estado'),direccion,recibe:val('f-recibe'),horario:val('f-hor'),contacto:val('f-cont')});
+    if(!ok){alert("No se pudo guardar. Revisa la conexión o que las tablas estén creadas en Supabase.");return;}
+    closeModal();refresh();};}
+
+function formTel(){openModal('<h2>Agregar número local</h2><p class="sub">Línea de emergencia o auxilio de tu zona.</p>'+
+  '<div class="field"><label>Servicio</label><input id="f-svc" placeholder="Ej: Bomberos de Mérida"></div>'+
+  '<div class="row2"><div class="field"><label>Número</label><input id="f-num" placeholder="Ej: 0274-xxx-xxxx"></div>'+
+  '<div class="field"><label>Estado / zona</label><select id="f-scope"><option value="Nacional">Nacional</option>'+estadoOptions()+'</select></div></div>'+
+  '<div class="modal-actions"><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn full" id="save">Agregar</button></div>');
+  document.getElementById('save').onclick=async()=>{const servicio=val('f-svc'),numero=val('f-num');
+    if(!servicio||!numero){alert("Indica el servicio y el número.");return;}
+    const ok=await sbInsert("telefonos",{servicio,numero,scope:val('f-scope')});
+    if(!ok){alert("No se pudo guardar. Revisa la conexión o que las tablas estén creadas en Supabase.");return;}
+    closeModal();refresh();};}
+
+document.getElementById('add-need').onclick=formNeed;
+document.getElementById('add-acopio').onclick=formAcopio;
+document.getElementById('add-tel').onclick=formTel;
+document.getElementById('cta-top').onclick=formNeed;
+document.getElementById('fab-btn').dataset.t='need';
+document.getElementById('fab-btn').onclick=()=>{document.getElementById('fab-btn').dataset.t==='acopio'?formAcopio():formNeed();};
+
+refresh();
+setInterval(refresh,30000);
+</script>
+</body>
+</html>
